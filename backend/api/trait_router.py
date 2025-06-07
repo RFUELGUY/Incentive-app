@@ -2,10 +2,10 @@
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from backend.db.database import SessionLocal
-from backend.crud import trait_config_crud
-from backend.utils.security import get_current_user_role
-from backend.schemas.trait_schema import TraitConfig, TraitUpdate
+from db.database import SessionLocal
+from crud import trait_config_crud
+from utils.security import get_current_user_role
+from schemas.trait_schema import TraitConfig, TraitUpdate
 router = APIRouter()
 
 # DB Dependency

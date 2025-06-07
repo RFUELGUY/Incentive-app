@@ -1,12 +1,12 @@
 from fastapi import APIRouter, UploadFile, File, Depends, HTTPException
 from sqlalchemy.orm import Session
-from backend.db.database import SessionLocal
-from backend.utils.security import get_current_user_role
+from db.database import SessionLocal
+from utils.security import get_current_user_role
 
 import pandas as pd
 from io import BytesIO
-from backend.models.actual_sale import ActualSale
-from backend.models.product import Product
+from models.actual_sale import ActualSale
+from models.product import Product
 
 router = APIRouter()
 

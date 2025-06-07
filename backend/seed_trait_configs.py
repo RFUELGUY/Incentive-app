@@ -1,8 +1,8 @@
 import sys, os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from sqlalchemy.orm import Session
-from backend.db.database import SessionLocal
-from backend.models.trait_config import TraitConfig
+from db.database import SessionLocal
+from models.trait_config import TraitConfig
 
 default_traits = [
     {"trait": "old", "percentage": 0.03, "is_visible": True},

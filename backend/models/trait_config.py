@@ -4,7 +4,7 @@ import os
 # 👇 Add the root directory of your project to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from sqlalchemy import Column, Integer, String, Float, Boolean
-from backend.db.database import Base
+from db.database import Base
 
 
 class TraitConfig(Base):

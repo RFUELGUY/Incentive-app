@@ -1,7 +1,7 @@
 from sqlalchemy import Column, String, Integer, Float, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from datetime import datetime
-from backend.db.database import Base
+from db.database import Base
 
 
 class ActualSale(Base):

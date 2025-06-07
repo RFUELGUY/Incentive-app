@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from backend.db.database import SessionLocal
-from backend.schemas.actual_sale_schema import ActualSaleSubmit, ActualSaleOut
-from backend.crud.actual_sale_crud import submit_actual_sale, get_sales_by_salesman_id
-from backend.utils.security import get_current_user_role
+from db.database import SessionLocal
+from schemas.actual_sale_schema import ActualSaleSubmit, ActualSaleOut
+from crud.actual_sale_crud import submit_actual_sale, get_sales_by_salesman_id
+from utils.security import get_current_user_role
 
 router = APIRouter()
 

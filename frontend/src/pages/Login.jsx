@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { jwtDecode } from "jwt-decode"; // ✅ correct import
+
 import { setToken } from "../auth/token";
+import API_BASE_URL from "../config";
 
 export default function Login() {
   const [mobile, setMobile] = useState("");
@@ -14,15 +17,21 @@ export default function Login() {
     setError("");
 
     try {
-      const res = await axios.post("http://localhost:8000/api/auth/login", {
+      const res = await axios.post(`${API_BASE_URL}/api/auth/login`, {
         mobile,
         password,
       });
 
-      const { access_token, role } = res.data;
+      const { access_token } = res.data;
 
+      // ✅ Save token
       setToken(access_token);
 
+      // ✅ Decode token to extract role
+      const decoded = jwtDecode(access_token);
+      const role = decoded.role;
+
+      // ✅ Route based on role
       if (role === "admin") {
         navigate("/admin");
       } else if (role === "salesman") {
@@ -31,7 +40,13 @@ export default function Login() {
         setError("Unrecognized role");
       }
     } catch (err) {
-      setError(err.response?.data?.detail || "Login failed");
+      console.error("Login failed:", err);
+      const detail = err.response?.data?.detail;
+      if (Array.isArray(detail)) {
+        setError(detail.map((d) => d.msg).join(", "));
+      } else {
+        setError(detail || "Login failed");
+      }
     }
   };
 

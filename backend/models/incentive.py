@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, Float, String, Boolean, ForeignKey, DateTime
 from datetime import datetime
-from backend.db.database import Base
+from db.database import Base
 
 class Incentive(Base):
     __tablename__ = "incentives"

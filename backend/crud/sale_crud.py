@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from backend.models.sale import Sale
-from backend.schemas.sale_schema import SaleSubmit
+from models.sale import Sale
+from schemas.sale_schema import SaleSubmit
 
 
 def submit_sale(db: Session, sale: SaleSubmit, salesman_id: int) -> Sale:

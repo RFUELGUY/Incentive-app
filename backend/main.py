@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from backend.db.database import engine, Base
-from backend.api import actual_sale_router
-from backend.api import (
+from db.database import engine, Base
+from api import actual_sale_router
+from api import (
     auth_router,
     sales_router,
     incentive_router,
@@ -10,7 +10,9 @@ from backend.api import (
     upload_router,
     trait_router,
     product_router,
-    secure_test_router
+    secure_test_router,
+    outlet_router,
+    public_router
 )
 import logging
 logging.basicConfig(level=logging.DEBUG)
@@ -27,7 +29,7 @@ app.add_middleware(
 )
 
 # Create all tables in the database
-Base.metadata.create_all(bind=engine)
+
 
 # Mount API routers
 app.include_router(auth_router.router, prefix="/api/auth", tags=["Auth"])
@@ -39,3 +41,5 @@ app.include_router(trait_router.router, prefix="/api/admin", tags=["TraitConfig"
 app.include_router(actual_sale_router.router, prefix="/api", tags=["ActualSale"])
 app.include_router(product_router.router, prefix="/api/products", tags=["Products"])
 app.include_router(secure_test_router.router)
+app.include_router(outlet_router.router, prefix="/api/admin", tags=["Outlet"])
+app.include_router(public_router.router, prefix="/api")

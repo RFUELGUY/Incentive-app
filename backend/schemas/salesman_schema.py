@@ -4,6 +4,7 @@ class SalesmanCreate(BaseModel):
     name: str
     mobile: str
     outlet: str
+    password: str
 
 class SalesmanApprove(BaseModel):
     mobile: str

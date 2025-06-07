@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from backend.models.claim import Claim
-from backend.models.incentive import Incentive
+from models.claim import Claim
+from models.incentive import Incentive
 from typing import Optional
 
 

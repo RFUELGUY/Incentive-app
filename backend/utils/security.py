@@ -8,9 +8,9 @@ from sqlalchemy.orm import Session
 import os
 from dotenv import load_dotenv
 
-from backend.utils.hash import verify_password, hash_password  # ✅ use only from hash.py
-from backend.crud.salesman_crud import get_salesman_by_phone
-from backend.db.database import SessionLocal
+from utils.hash import verify_password, hash_password  # ✅ use only from hash.py
+from crud.salesman_crud import get_salesman_by_phone
+from db.database import SessionLocal
 
 load_dotenv()
 MASTER_ADMIN_SECRET = os.getenv("MASTER_ADMIN_SECRET")
@@ -57,7 +57,7 @@ def get_current_user_role(required_role: str):
 
         if required_role == "admin":
             # ⛔ avoid importing at top to break circular import
-            from backend.crud.admin_crud import get_admin_by_phone
+            from crud.admin_crud import get_admin_by_phone
             user = get_admin_by_phone(db, phone)
         else:
             user = get_salesman_by_phone(db, phone)

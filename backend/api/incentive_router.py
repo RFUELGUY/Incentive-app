@@ -2,20 +2,20 @@
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from backend.db.database import SessionLocal
-from backend.schemas.incentive_schema import IncentiveOut
-from backend.schemas.claim_schema import ClaimRequest, ClaimOut
-from backend.crud.claim_crud import (
+from db.database import SessionLocal
+from schemas.incentive_schema import IncentiveOut
+from schemas.claim_schema import ClaimRequest, ClaimOut
+from crud.claim_crud import (
     get_all_claims,
     submit_claim,
     approve_claim_by_id
 )
-from backend.crud.incentive_crud import (
+from crud.incentive_crud import (
     get_incentives_for_salesman,
     
     generate_incentives
 )
-from backend.utils.security import get_current_user_role
+from utils.security import get_current_user_role
 
 router = APIRouter()
 

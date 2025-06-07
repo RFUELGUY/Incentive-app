@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from backend.models.trait_config import TraitConfig
+from models.trait_config import TraitConfig
 
 
 def get_all_traits(db: Session) -> list[TraitConfig]:

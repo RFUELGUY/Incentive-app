@@ -5,10 +5,10 @@ from sqlalchemy.orm import Session
 from tempfile import NamedTemporaryFile
 import shutil
 
-from backend.db.database import SessionLocal
-from backend.schemas.product_schema import ProductSubmit
-from backend.crud.product_crud import upsert_product, upsert_products_from_file
-from backend.utils.security import get_current_user_role
+from db.database import SessionLocal
+from schemas.product_schema import ProductSubmit
+from crud.product_crud import upsert_product, upsert_products_from_file
+from utils.security import get_current_user_role
 
 router = APIRouter()
 

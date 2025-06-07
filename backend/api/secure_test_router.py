@@ -1,7 +1,7 @@
 # incentive-app/backend/api/secure_test_router.py
 
 from fastapi import APIRouter, Depends
-from backend.utils.security import get_current_user_role
+from utils.security import get_current_user_role
 
 router = APIRouter(prefix="/secure-test", tags=["Secure Testing"])
 

@@ -1,7 +1,7 @@
 import pandas as pd
 from sqlalchemy.orm import Session
-from backend.models.product import Product
-from backend.schemas.product_schema import ProductSubmit
+from models.product import Product
+from schemas.product_schema import ProductSubmit
 
 
 def upsert_product(db: Session, payload: ProductSubmit) -> Product:

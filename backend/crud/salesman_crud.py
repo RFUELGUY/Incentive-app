@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
-from backend.models.salesman import Salesman
-from backend.schemas.salesman_schema import SalesmanCreate, SalesmanApprove
-from backend.utils.hash import hash_password, verify_password
+from models.salesman import Salesman
+from schemas.salesman_schema import SalesmanCreate, SalesmanApprove
+from utils.hash import hash_password, verify_password
 
 
 def create_salesman(db: Session, data: SalesmanCreate) -> Salesman:

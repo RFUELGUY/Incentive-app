@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from backend.models.actual_sale import ActualSale
-from backend.schemas.actual_sale_schema import ActualSaleSubmit
+from models.actual_sale import ActualSale
+from schemas.actual_sale_schema import ActualSaleSubmit
 
 
 def submit_actual_sale(db: Session, payload: ActualSaleSubmit, salesman_id: int) -> ActualSale:

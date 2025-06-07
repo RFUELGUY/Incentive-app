@@ -3,17 +3,21 @@
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
-
-from backend.db.database import SessionLocal
-from backend.models.admin import Admin
-from backend.utils.security import (
+from schemas.outlet_schema import OutletOut
+from crud.outlet_crud import get_all_outlets
+from db.database import SessionLocal
+from models.admin import Admin
+from crud.system_crud import get_status, mark_setup_complete
+from schemas.system_schema import SetupStatusOut
+from utils.security import (
     get_current_user_role,
     hash_password,
     MASTER_ADMIN_SECRET
 )
-from backend.crud.admin_crud import get_admin_by_phone
+from crud.admin_crud import get_admin_by_phone
 
-router = APIRouter(prefix="/admin", tags=["Admin"])
+router = APIRouter(tags=["Admin"])
+
 
 # -------------------------------
 # DB Dependency
@@ -36,7 +40,7 @@ def ping_admin(admin=Depends(get_current_user_role("admin"))):
     return {"status": "admin router active", "admin": admin.phone}
 
 # -------------------------------
-# 🔐 Admin Creation via Master Key
+# 🔐 Admin Creation via Master Key  
 # -------------------------------
 class AdminCreateRequest(BaseModel):
     name: str
@@ -71,3 +75,19 @@ def create_admin(payload: AdminCreateRequest, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=f"Admin creation failed: {str(e)}")
 
     return {"message": "✅ Admin created", "phone": new_admin.phone}
+@router.get("/outlets", response_model=list[OutletOut])
+def list_outlets(db: Session = Depends(get_db), admin=Depends(get_current_user_role("admin"))):
+    """
+    Admin: Get list of all outlets.
+    """
+    return get_all_outlets(db)
+
+@router.get("/setup/status", response_model=SetupStatusOut)
+def check_setup_status(db: Session = Depends(get_db)):
+    status = get_status(db)
+    return {"setup_complete": status.setup_complete if status else False}
+
+@router.post("/setup/complete")
+def complete_setup(db: Session = Depends(get_db)):
+    state = mark_setup_complete(db)
+    return {"message": "Setup marked complete", "setup_complete": state.setup_complete}

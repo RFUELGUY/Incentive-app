@@ -2,10 +2,10 @@
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from backend.schemas.sale_schema import SaleSubmit, SaleOut
-from backend.crud.sale_crud import submit_sale, get_sales_by_salesman
-from backend.db.database import SessionLocal
-from backend.utils.security import get_current_user_role
+from schemas.sale_schema import SaleSubmit, SaleOut
+from crud.sale_crud import submit_sale, get_sales_by_salesman
+from db.database import SessionLocal
+from utils.security import get_current_user_role
 
 router = APIRouter()
 
