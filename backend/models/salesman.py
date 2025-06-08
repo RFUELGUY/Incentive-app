@@ -16,4 +16,5 @@ class Salesman(Base):
     sales = relationship("Sale", back_populates="salesman")
     created_at = Column(DateTime, default=datetime.utcnow)
     streaks = relationship("Streak", back_populates="salesman", cascade="all, delete")
+    claims = relationship("Claim", back_populates="salesman")
 

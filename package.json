@@ -3,6 +3,11 @@
   "private": true,
   "version": "0.0.1",
   "dependencies": {
-    "jwt-decode": "^4.0.0"
+    "jwt-decode": "^4.0.0",
+    "react-toastify": "^11.0.5",
+    "socket.io-client": "^4.8.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.30"
   }
 }

@@ -37,14 +37,14 @@ def ping_admin(admin=Depends(get_current_user_role("admin"))):
     """
     Admin: Test route to confirm admin access.
     """
-    return {"status": "admin router active", "admin": admin.phone}
+    return {"status": "admin router active", "admin": admin.mobile}
 
 # -------------------------------
 # 🔐 Admin Creation via Master Key  
 # -------------------------------
 class AdminCreateRequest(BaseModel):
     name: str
-    phone: str
+    mobile: str
     password: str
     master_key: str
 
@@ -56,12 +56,12 @@ def create_admin(payload: AdminCreateRequest, db: Session = Depends(get_db)):
     if payload.master_key != MASTER_ADMIN_SECRET:
         raise HTTPException(status_code=403, detail="Invalid master key")
 
-    if get_admin_by_phone(db, payload.phone):
+    if get_admin_by_phone(db, payload.mobile):
         raise HTTPException(status_code=409, detail="Admin already exists")
 
     new_admin = Admin(
         name=payload.name,
-        phone=payload.phone,
+        mobile=payload.mobile,
         hashed_password=hash_password(payload.password),
         is_active=True
     )
@@ -74,7 +74,7 @@ def create_admin(payload: AdminCreateRequest, db: Session = Depends(get_db)):
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Admin creation failed: {str(e)}")
 
-    return {"message": "✅ Admin created", "phone": new_admin.phone}
+    return {"message": "✅ Admin created", "mobile": new_admin.mobile}
 @router.get("/outlets", response_model=list[OutletOut])
 def list_outlets(db: Session = Depends(get_db), admin=Depends(get_current_user_role("admin"))):
     """

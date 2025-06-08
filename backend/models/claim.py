@@ -15,4 +15,5 @@ class Claim(Base):
     timestamp = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow)
 
-    salesman = relationship("Salesman", backref="claims")
+    salesman = relationship("Salesman", back_populates="claims")
+

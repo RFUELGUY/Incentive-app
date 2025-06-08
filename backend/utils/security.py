@@ -53,14 +53,14 @@ def get_current_user_role(required_role: str):
         if not payload or payload.get("sub") is None or payload.get("role") != required_role:
             raise HTTPException(status_code=403, detail="Not authorized")
 
-        phone = payload["sub"]
+        mobile = payload["sub"]
 
         if required_role == "admin":
             # ⛔ avoid importing at top to break circular import
             from crud.admin_crud import get_admin_by_phone
-            user = get_admin_by_phone(db, phone)
+            user = get_admin_by_phone(db, mobile)
         else:
-            user = get_salesman_by_phone(db, phone)
+            user = get_salesman_by_phone(db, mobile)
 
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
