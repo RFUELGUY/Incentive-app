@@ -28,7 +28,8 @@ from models import (
     trait_config,
     system,
     outlet,
-    streak
+    streak,
+    verticle
 )
    # import your model files here (add others as needed)
 

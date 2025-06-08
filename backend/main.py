@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from db.database import engine, Base
 from api import actual_sale_router
 from api.claim_router import router as claim_router
+from api.leaderboard_router import router as leaderboard_router
 from api import (
     auth_router,
     sales_router,
@@ -15,8 +16,8 @@ from api import (
     outlet_router,
     public_router,
     streak_router,
-    leaderboard_router,
-    salesman_router
+    salesman_router,
+    verticle_router
 )
 import logging
 logging.basicConfig(level=logging.DEBUG)
@@ -26,7 +27,7 @@ app = FastAPI(title="Incentive Management System")
 # Enable CORS (adjust allowed origins for production)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # 🔐 Replace with actual frontend URL in production
+    allow_origins=["http://localhost:5173"],  # 🔐 Replace with actual frontend URL in production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -48,7 +49,8 @@ app.include_router(secure_test_router.router)
 app.include_router(outlet_router.router, prefix="/api/admin", tags=["Outlet"])
 app.include_router(public_router.router, prefix="/api")
 app.include_router(streak_router.router, prefix="/api")
-app.include_router(leaderboard_router.router, prefix="/api/leaderboard", tags=["Leaderboard"])
+app.include_router(leaderboard_router, prefix="/api/leaderboard", tags=["Leaderboard"])
 app.include_router(claim_router)
 app.include_router(public_router.router, prefix="/api/public", tags=["Public"])
 app.include_router(salesman_router.router, prefix="", tags=["Salesman"])
+app.include_router(verticle_router.router, prefix="/api/admin", tags=["Verticles"])

@@ -7,16 +7,17 @@ import Button from "../../components/ui/Button";
 export default function SetupPanel() {
   const [setupComplete, setSetupComplete] = useState(null);
   const [outletName, setOutletName] = useState("");
-  const [categoryName, setCategoryName] = useState("");
+  const [verticleName, setVerticleName] = useState("");
+  const [verticleDesc, setVerticleDesc] = useState("");
   const [outlets, setOutlets] = useState([]);
-  const [categories, setCategories] = useState([]);
+  const [verticles, setVerticles] = useState([]);
 
   const token = localStorage.getItem("token");
 
   useEffect(() => {
     checkSetupStatus();
     fetchOutlets();
-    fetchCategories();
+    fetchVerticles();
   }, []);
 
   const checkSetupStatus = async () => {
@@ -41,14 +42,14 @@ export default function SetupPanel() {
     }
   };
 
-  const fetchCategories = async () => {
+  const fetchVerticles = async () => {
     try {
-      const res = await axios.get(`${API_BASE_URL}/api/admin/categories`, {
+      const res = await axios.get(`${API_BASE_URL}/api/admin/verticles`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setCategories(res.data);
+      setVerticles(res.data);
     } catch (err) {
-      console.error("Failed to fetch categories", err);
+      console.error("Failed to fetch verticles", err);
     }
   };
 
@@ -69,20 +70,81 @@ export default function SetupPanel() {
     }
   };
 
-  const handleAddCategory = async () => {
-    if (!categoryName.trim()) return alert("Enter category name.");
+  const handleAddVerticle = async () => {
+    if (!verticleName.trim()) return alert("Enter verticle name.");
+    const exists = verticles.some(
+      (v) => v.name.toLowerCase() === verticleName.trim().toLowerCase()
+    );
+    if (exists) {
+      alert("A verticle with this name already exists.");
+      return;
+    }
+
     try {
       await axios.post(
-        `${API_BASE_URL}/api/admin/categories`,
-        { name: categoryName },
+        `${API_BASE_URL}/api/admin/verticles`,
         {
-          headers: { Authorization: `Bearer ${token}` },
+          name: verticleName.trim(),
+          description: verticleDesc.trim(),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
         }
       );
-      setCategoryName("");
-      fetchCategories();
+      setVerticleName("");
+      setVerticleDesc("");
+      fetchVerticles();
     } catch (err) {
-      console.error("Category creation failed", err);
+      console.error("Verticle creation failed", err);
+    }
+  };
+
+  const handleEditVerticle = async (id, currentName, currentDesc) => {
+    const newName = prompt("Edit verticle name:", currentName);
+    if (!newName || newName.trim() === "") return;
+
+    const duplicate = verticles.some(
+      (v) => v.name.toLowerCase() === newName.toLowerCase() && v.id !== id
+    );
+    if (duplicate) {
+      alert("A verticle with this name already exists.");
+      return;
+    }
+
+    const newDesc = prompt("Edit description (optional):", currentDesc || "");
+
+    try {
+      await axios.put(
+        `${API_BASE_URL}/api/admin/verticles/${id}`,
+        {
+          name: newName.trim(),
+          description: newDesc.trim(),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      fetchVerticles();
+    } catch (err) {
+      console.error("Verticle update failed", err);
+    }
+  };
+
+  const handleDeleteVerticle = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this verticle?")) return;
+    try {
+      await axios.delete(`${API_BASE_URL}/api/admin/verticles/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      fetchVerticles();
+    } catch (err) {
+      console.error("Verticle deletion failed", err);
     }
   };
 
@@ -126,20 +188,41 @@ export default function SetupPanel() {
         </ul>
       </div>
 
-      {/* Category Setup */}
+      {/* Verticle Setup */}
       <div>
-        <h3 className="font-semibold mb-2">🏷️ Categories / Verticals</h3>
-        <div className="flex gap-2">
+        <h3 className="font-semibold mb-2">📦 Verticles</h3>
+        <div className="flex gap-2 flex-wrap">
           <Input
-            placeholder="Category name"
-            value={categoryName}
-            onChange={(e) => setCategoryName(e.target.value)}
+            placeholder="Verticle name"
+            value={verticleName}
+            onChange={(e) => setVerticleName(e.target.value)}
           />
-          <Button onClick={handleAddCategory}>Add</Button>
+          <Input
+            placeholder="Description (optional)"
+            value={verticleDesc}
+            onChange={(e) => setVerticleDesc(e.target.value)}
+          />
+          <Button onClick={handleAddVerticle}>Add</Button>
         </div>
-        <ul className="text-sm mt-2 list-disc ml-6">
-          {categories.map((c) => (
-            <li key={c.id}>{c.name}</li>
+        <ul className="text-sm mt-2 list-disc ml-6 space-y-1">
+          {verticles.map((v) => (
+            <li key={v.id} className="flex justify-between items-center">
+              <span>
+                <strong>{v.name}</strong>
+                {v.description && ` – ${v.description}`}
+              </span>
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  onClick={() => handleEditVerticle(v.id, v.name, v.description)}
+                >
+                  ✏️
+                </Button>
+                <Button size="sm" variant="danger" onClick={() => handleDeleteVerticle(v.id)}>
+                  ❌
+                </Button>
+              </div>
+            </li>
           ))}
         </ul>
       </div>
@@ -152,4 +235,3 @@ export default function SetupPanel() {
     </div>
   );
 }
-

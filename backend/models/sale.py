@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Float
 from sqlalchemy.orm import relationship
 from db.database import Base
 from datetime import datetime
@@ -13,3 +13,4 @@ class Sale(Base):
     # Optional: if you want backref from Salesman
     salesman = relationship("Salesman", back_populates="sales")
     timestamp = Column(DateTime, default=datetime.utcnow)
+    amount = Column(Float, nullable=False)

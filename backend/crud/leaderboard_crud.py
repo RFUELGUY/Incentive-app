@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from datetime import date, timedelta, datetime
+from datetime import date, timedelta
 
 from models.sale import Sale
 from models.salesman import Salesman
@@ -26,14 +26,14 @@ def calculate_leaderboard(db: Session, period: str = "day"):
     results = (
         db.query(Salesman.name, func.sum(Sale.amount).label("total_sales"))
         .join(Sale, Salesman.id == Sale.salesman_id)
-        .filter(Sale.date >= start_date)
+        .filter(Sale.timestamp >= start_date)
         .group_by(Salesman.id)
         .order_by(func.sum(Sale.amount).desc())
         .limit(10)
         .all()
     )
 
-    return [{"name": r.name, "sales": float(r.total_sales)} for r in results]
+    return [{"name": r.name, "sales": float(r.total_sales or 0)} for r in results]
 
 
 def get_leaderboard(db: Session, scope: str):

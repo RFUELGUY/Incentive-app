@@ -5,6 +5,6 @@ class Product(Base):
     __tablename__ = "products"
     
     barcode = Column(String, primary_key=True, index=True)
-    verticle = Column(String)
-    trait = Column(String)  # old / new / specialxyz
-    rsp = Column(Float)     # retail selling price
+    verticle = Column(String, index=True)  # added index for faster lookup
+    trait = Column(String)                 # e.g., old / new / specialxyz
+    rsp = Column(Float)                    # retail selling price

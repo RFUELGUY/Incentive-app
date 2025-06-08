@@ -13,7 +13,7 @@ export default function TraitsConfig() {
   const fetchTraits = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get(`${API_BASE_URL}/api/traits`, {
+      const res = await axios.get(`${API_BASE_URL}/api/admin/traits`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setTraits(res.data);
@@ -53,7 +53,7 @@ export default function TraitsConfig() {
   const handleUpdateTrait = async (trait, updates) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.put(`${API_BASE_URL}/api/traits/${trait}`, updates, {
+      await axios.put(`${API_BASE_URL}/api/admin/traits/${trait}`, updates, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchTraits();
@@ -67,7 +67,7 @@ export default function TraitsConfig() {
     if (!confirm("Delete this trait?")) return;
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`${API_BASE_URL}/api/traits/${trait}`, {
+      await axios.delete(`${API_BASE_URL}/api/admin/traits/${trait}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchTraits();

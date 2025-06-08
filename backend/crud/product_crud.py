@@ -1,26 +1,41 @@
 import pandas as pd
 from sqlalchemy.orm import Session
 from models.product import Product
+from models.verticle import Verticle
 from schemas.product_schema import ProductSubmit
+from sqlalchemy import func
+
+
+def get_or_create_verticle(db: Session, name: str) -> Verticle:
+    name_clean = name.strip().lower()
+    verticle = db.query(Verticle).filter(func.lower(Verticle.name) == name_clean).first()
+    if not verticle:
+        verticle = Verticle(name=name_clean)
+        db.add(verticle)
+        db.commit()
+        db.refresh(verticle)
+    return verticle
 
 
 def upsert_product(db: Session, payload: ProductSubmit) -> Product:
     """
     Insert or update a single product row.
-    Returns the upserted product instance.
+    Also creates Verticle if not already present (case-insensitive).
     """
-    existing = db.query(Product).filter_by(barcode=payload.barcode).first()
-
     try:
+        get_or_create_verticle(db, payload.verticle)
+
+        existing = db.query(Product).filter_by(barcode=payload.barcode).first()
+
         if existing:
-            existing.verticle = payload.verticle
-            existing.trait = payload.trait
+            existing.verticle = payload.verticle.strip().lower()
+            existing.trait = payload.trait.strip()
             existing.rsp = payload.rsp
         else:
             new = Product(
-                barcode=payload.barcode,
-                verticle=payload.verticle,
-                trait=payload.trait,
+                barcode=payload.barcode.strip(),
+                verticle=payload.verticle.strip().lower(),
+                trait=payload.trait.strip(),
                 rsp=payload.rsp
             )
             db.add(new)
@@ -36,8 +51,7 @@ def upsert_product(db: Session, payload: ProductSubmit) -> Product:
 def upsert_products_from_file(db: Session, file_path: str) -> dict:
     """
     Insert or update multiple products from an Excel or CSV file.
-    File must contain: barcode, verticle, trait, rsp
-    Returns count of processed products.
+    Auto-creates Verticles if missing.
     """
     try:
         if file_path.endswith((".xlsx", ".xls")):
@@ -49,7 +63,7 @@ def upsert_products_from_file(db: Session, file_path: str) -> dict:
 
         required_columns = {"barcode", "verticle", "trait", "rsp"}
         if not required_columns.issubset(set(df.columns)):
-            raise ValueError(f"Missing required columns: {required_columns - set(df.columns)}")
+            raise ValueError(f"Missing columns: {required_columns - set(df.columns)}")
 
         upserted_count = 0
 
@@ -58,28 +72,31 @@ def upsert_products_from_file(db: Session, file_path: str) -> dict:
             if not barcode or pd.isna(barcode):
                 continue
 
-            existing = db.query(Product).filter_by(barcode=barcode).first()
-            rsp = float(row["rsp"]) if not pd.isna(row["rsp"]) else 0.0
+            verticle = str(row.get("verticle", "")).strip().lower()
+            trait = str(row.get("trait", "")).strip()
+            rsp = float(row.get("rsp", 0.0)) if not pd.isna(row.get("rsp")) else 0.0
 
+            get_or_create_verticle(db, verticle)
+
+            existing = db.query(Product).filter_by(barcode=barcode).first()
             if existing:
-                existing.verticle = str(row["verticle"]).strip()
-                existing.trait = str(row["trait"]).strip()
+                existing.verticle = verticle
+                existing.trait = trait
                 existing.rsp = rsp
             else:
-                product = Product(
+                new_product = Product(
                     barcode=barcode,
-                    verticle=str(row["verticle"]).strip(),
-                    trait=str(row["trait"]).strip(),
+                    verticle=verticle,
+                    trait=trait,
                     rsp=rsp
                 )
-                db.add(product)
+                db.add(new_product)
 
             upserted_count += 1
 
         db.commit()
+        return {"upserted": upserted_count}
 
     except Exception as e:
         db.rollback()
         raise e
-
-    return {"upserted": upserted_count}

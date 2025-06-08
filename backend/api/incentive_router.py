@@ -83,7 +83,7 @@ def generate(
 
 
 # ✅ Admin: View all incentives
-@router.get("/incentives", response_model=list[IncentiveOut])
+@router.get("/", response_model=list[IncentiveOut])
 def get_all(
     db: Session = Depends(get_db),
     admin=Depends(get_current_user_role("admin"))

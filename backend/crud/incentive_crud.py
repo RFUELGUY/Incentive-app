@@ -80,7 +80,8 @@ def get_all_incentives(db: Session) -> list[Incentive]:
     """
     Admin: Fetch all incentives in the system.
     """
-    return db.query(Incentive).order_by(Incentive.created_at.desc()).all()
+    return db.query(Incentive).order_by(Incentive.timestamp.desc()).all()
+
 
 
 def toggle_incentive_visibility(db: Session, incentive_id: int, is_visible: bool) -> Incentive:

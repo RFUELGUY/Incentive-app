@@ -11,9 +11,13 @@ const UserManager = () => {
   const fetchSalesmen = async () => {
     try {
       const response = await axios.get("/salesmen");
-      setSalesmen(response.data);
+      const data = Array.isArray(response.data) ? response.data : [];
+      setSalesmen(data);
+      console.log("Fetched salesmen:", data); // 🔍 optional debug log
     } catch (error) {
+      console.error("Failed to fetch salesmen:", error);
       toast.error("Failed to fetch salesmen");
+      setSalesmen([]); // Fallback to empty array to prevent .map errors
     } finally {
       setLoading(false);
     }
@@ -24,8 +28,9 @@ const UserManager = () => {
     try {
       await axios.delete(`/salesmen/${id}`);
       toast.success("Salesman removed");
-      setSalesmen(salesmen.filter(s => s.id !== id));
+      setSalesmen((prev) => prev.filter((s) => s.id !== id));
     } catch (error) {
+      console.error("Failed to remove salesman:", error);
       toast.error("Failed to remove salesman");
     }
   };
@@ -43,7 +48,7 @@ const UserManager = () => {
         {salesmen.length === 0 ? (
           <div>No approved salesmen found.</div>
         ) : (
-          salesmen.map(salesman => (
+          salesmen.map((salesman) => (
             <div
               key={salesman.id}
               className="flex items-center justify-between border p-2 rounded"
