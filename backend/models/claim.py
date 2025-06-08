@@ -1,17 +1,23 @@
-from sqlalchemy import Column, Integer, Float, String, Boolean, ForeignKey, DateTime
-from sqlalchemy.orm import relationship
-from sqlalchemy.sql import func
-from db.database import Base
+from pydantic import BaseModel
+from datetime import datetime
+from typing import Optional
 
-class Claim(Base):
-    __tablename__ = "claims"
 
-    id = Column(Integer, primary_key=True, index=True)
-    salesman_id = Column(Integer, ForeignKey("salesmen.id"), nullable=False)
-    total_amount = Column(Float, nullable=False)
-    is_approved = Column(Boolean, default=False)
-    remarks = Column(String, nullable=True)
+class ClaimOut(BaseModel):
+    id: int
+    salesman_id: int
+    total_amount: float
+    is_approved: bool
+    remarks: Optional[str]
+    timestamp: datetime
 
-    timestamp = Column(DateTime(timezone=True), server_default=func.now())
+    # Extras for frontend
+    salesman_name: Optional[str] = "Salesman"
+    reason: Optional[str] = None
 
-    salesman = relationship("Salesman", back_populates="claims")
+    class Config:
+        orm_mode = True
+
+
+class ClaimUpdateRequest(BaseModel):
+    new_remarks: str

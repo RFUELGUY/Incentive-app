@@ -10,9 +10,9 @@ from schemas.product_schema import ProductSubmit
 from crud.product_crud import upsert_product, upsert_products_from_file
 from utils.security import get_current_user_role
 
-router = APIRouter()
+router = APIRouter(prefix="/api/products", tags=["Products"])
 
-# Dependency to get DB session
+# 🔌 DB Dependency
 def get_db():
     db = SessionLocal()
     try:
@@ -20,8 +20,8 @@ def get_db():
     finally:
         db.close()
 
-
-@router.post("/upload-product-file")
+# 📦 Bulk Product Upload
+@router.post("/upload-file")
 def upload_product_file(
     file: UploadFile = File(...),
     db: Session = Depends(get_db),
@@ -37,20 +37,21 @@ def upload_product_file(
         with NamedTemporaryFile(delete=False, suffix=file.filename) as tmp:
             shutil.copyfileobj(file.file, tmp)
             tmp_path = tmp.name
+
         result = upsert_products_from_file(db, tmp_path)
         return {"message": "File processed", "details": result}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
-@router.post("/add-product")
+# ➕ Manual Add/Update Product
+@router.post("/add")
 def add_product(
     payload: ProductSubmit,
     db: Session = Depends(get_db),
     admin=Depends(get_current_user_role("admin"))
 ):
     """
-    Admin: Add or update a single product manually.
+    Admin: Add or update a single product manually by barcode.
     """
     try:
         upsert_product(db, payload)

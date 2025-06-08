@@ -17,7 +17,6 @@ def generate_incentives(db: Session) -> dict:
 
     try:
         for sale in sales:
-            # Match exact actual sale (optional: include qty/net_amount for stricter match)
             match = db.query(ActualSale).filter_by(
                 customer=sale.customer_number,
                 barcode=sale.barcode,
@@ -27,17 +26,14 @@ def generate_incentives(db: Session) -> dict:
             if not match:
                 continue
 
-            # Get product details
             product = db.query(Product).filter_by(barcode=sale.barcode).first()
             if not product:
                 continue
 
-            # Get trait config
             trait_config = db.query(TraitConfig).filter_by(trait=product.trait).first()
             if not trait_config or not trait_config.percentage or trait_config.percentage <= 0:
                 continue
 
-            # Prevent duplicates
             existing = db.query(Incentive).filter_by(
                 salesman_id=sale.salesman_id,
                 barcode=sale.barcode,
@@ -47,7 +43,6 @@ def generate_incentives(db: Session) -> dict:
                 skipped += 1
                 continue
 
-            # Calculate incentive
             earned = match.net_amount * trait_config.percentage
 
             incentive = Incentive(
@@ -85,4 +80,17 @@ def get_all_incentives(db: Session) -> list[Incentive]:
     """
     Admin: Fetch all incentives in the system.
     """
-    return db.query(Incentive).all()
+    return db.query(Incentive).order_by(Incentive.created_at.desc()).all()
+
+
+def toggle_incentive_visibility(db: Session, incentive_id: int, is_visible: bool) -> Incentive:
+    """
+    Admin: Update the visibility status of a specific incentive.
+    """
+    incentive = db.query(Incentive).filter_by(id=incentive_id).first()
+    if not incentive:
+        raise ValueError("Incentive not found")
+    incentive.is_visible = is_visible
+    db.commit()
+    db.refresh(incentive)
+    return incentive
