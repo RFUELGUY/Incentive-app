@@ -15,7 +15,8 @@ from api import (
     outlet_router,
     public_router,
     streak_router,
-    leaderboard_router
+    leaderboard_router,
+    salesman_router
 )
 import logging
 logging.basicConfig(level=logging.DEBUG)
@@ -51,3 +52,4 @@ app.include_router(leaderboard_router.router, prefix="/api/leaderboard", tags=["
 app.include_router(claim_router)
 app.include_router(claim_router.router, prefix="/api/claims", tags=["Claims"])
 app.include_router(public_router.router, prefix="/api/public", tags=["Public"])
+app.include_router(salesman_router.router, prefix="", tags=["Salesman"])

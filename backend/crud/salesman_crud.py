@@ -85,3 +85,15 @@ def get_salesman_by_phone(db: Session, mobile: str) -> Salesman | None:
     Fetch a salesman by mobile number. Used for auth validation.
     """
     return db.query(Salesman).filter_by(mobile=mobile).first()
+
+
+def get_all_approved_salesmen(db: Session) -> list[Salesman]:
+    return db.query(Salesman).filter_by(is_approved=True).all()
+
+def delete_salesman(db: Session, salesman_id: int) -> bool:
+    salesman = db.query(Salesman).filter_by(id=salesman_id, is_approved=True).first()
+    if not salesman:
+        return False
+    db.delete(salesman)
+    db.commit()
+    return True

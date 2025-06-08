@@ -1,23 +1,18 @@
-from pydantic import BaseModel
+from sqlalchemy import Column, Integer, Float, Boolean, String, DateTime, ForeignKey
+from sqlalchemy.orm import relationship
 from datetime import datetime
-from typing import Optional
+from db.database import Base
 
+class Claim(Base):
+    __tablename__ = "claims"
 
-class ClaimOut(BaseModel):
-    id: int
-    salesman_id: int
-    total_amount: float
-    is_approved: bool
-    remarks: Optional[str]
-    timestamp: datetime
+    id = Column(Integer, primary_key=True, index=True)
+    salesman_id = Column(Integer, ForeignKey("salesmen.id"))
+    total_amount = Column(Float, nullable=False)
+    is_approved = Column(Boolean, default=False)
+    remarks = Column(String, nullable=True)
+    status = Column(String, default="pending")  # added for rejection tracking
+    timestamp = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow)
 
-    # Extras for frontend
-    salesman_name: Optional[str] = "Salesman"
-    reason: Optional[str] = None
-
-    class Config:
-        orm_mode = True
-
-
-class ClaimUpdateRequest(BaseModel):
-    new_remarks: str
+    salesman = relationship("Salesman", backref="claims")

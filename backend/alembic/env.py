@@ -27,7 +27,8 @@ from models import (
     sale,
     trait_config,
     system,
-    outlet
+    outlet,
+    streak
 )
    # import your model files here (add others as needed)
 

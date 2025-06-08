@@ -16,3 +16,9 @@ def view_streaks(salesman_id: int, db: Session = Depends(get_db), admin=Depends(
     if not streaks:
         raise HTTPException(status_code=404, detail="No streak data found")
     return streaks
+@router.get("/day")
+def leaderboard_day(db: Session = Depends(get_db)):
+    """
+    Public: Star of the Day leaderboard
+    """
+    return calculate_leaderboard(db, period="day")
