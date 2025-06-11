@@ -2,6 +2,8 @@ from sqlalchemy.orm import Session
 from models.salesman import Salesman
 from schemas.salesman_schema import SalesmanCreate, SalesmanApprove
 from utils.hash import hash_password, verify_password
+from typing import Optional
+
 
 
 def create_salesman(db: Session, data: SalesmanCreate) -> Salesman:
@@ -38,22 +40,13 @@ def get_pending_salesmen(db: Session) -> list[Salesman]:
     return db.query(Salesman).filter_by(is_approved=False).all()
 
 
-def approve_salesman(db: Session, salesman_id: int, data: SalesmanApprove) -> Salesman | None:
-    """
-    Approve a salesman and set their password, outlet, and category.
-    Returns None if salesman not found.
-    """
-    salesman = db.query(Salesman).filter_by(id=salesman_id).first()
+def approve_salesman(db: Session, salesman_id: int, approve: bool) -> Optional[Salesman]:
+    salesman = db.query(Salesman).filter(Salesman.id == salesman_id).first()
+
     if not salesman:
         return None
 
-    if salesman.is_approved:
-        return salesman  # Already approved
-
-    salesman.outlet = data.outlet
-    salesman.category = data.category
-    salesman.password = hash_password(data.password)
-    salesman.is_approved = True
+    salesman.is_approved = approve
 
     try:
         db.commit()
@@ -63,6 +56,7 @@ def approve_salesman(db: Session, salesman_id: int, data: SalesmanApprove) -> Sa
         raise e
 
     return salesman
+
 
 
 def login_salesman_by_credentials(db: Session, mobile: str, password: str) -> Salesman | None:

@@ -21,6 +21,8 @@ class SalesmanOut(BaseModel):
     mobile: str
     outlet: str
     is_approved: bool
+    category: str | None = None
+    wallet_balance: int  # <- Add this
 
     class Config:
-        orm_mode = True  # works fine in Pydantic v1 or `from_attributes` in v2
+        orm_mode = True

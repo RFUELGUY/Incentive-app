@@ -1,9 +1,7 @@
-# incentive-app/backend/api/auth_router.py
-
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
-
+from schemas.auth_schema import ApproveRequest
 from schemas.salesman_schema import (
     SalesmanCreate,
     SalesmanLogin,
@@ -25,7 +23,7 @@ from utils.security import (
 from db.database import SessionLocal
 
 # 🔥 Removed internal prefix to avoid /api/auth/auth duplication
-router = APIRouter(tags=["Authentication"])
+router = APIRouter()
 
 # Dependency
 def get_db():
@@ -58,21 +56,20 @@ def list_pending(db: Session = Depends(get_db), admin=Depends(get_current_user_r
 
 # ----------- Admin Only: Approve Salesman -----------
 
-@router.post("/approve/{salesman_id}", response_model=SalesmanOut)
-def approve(
+@router.post("/salesmen/{salesman_id}/approve", response_model=SalesmanOut)
+def approve_or_deny_salesman(
     salesman_id: int,
-    data: SalesmanApprove,
+    payload: ApproveRequest,                     # ✅ use request body as a Pydantic model
     db: Session = Depends(get_db),
-    admin=Depends(get_current_user_role("admin")),
+    admin=Depends(get_current_user_role("admin"))
 ):
-    """
-    Admin Only: Approve a salesman and set password, category, and outlet.
-    """
-    approved = approve_salesman(db, salesman_id, data)
-    if not approved:
-        raise HTTPException(status_code=404, detail="Salesman not found")
-    return approved
+    
 
+    salesman = approve_salesman(db, salesman_id, payload.approve)
+    if not salesman:
+        raise HTTPException(status_code=404, detail="Salesman not found")
+
+    return salesman
 
 # ----------- Shared Login Endpoint (Admin / Salesman) -----------
 

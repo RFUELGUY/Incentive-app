@@ -10,22 +10,29 @@ export default function Signup() {
     name: "",
     mobile: "",
     outlet: "",
+    verticle: "",
     password: "",
   });
+
   const [outlets, setOutlets] = useState([]);
+  const [verticles, setVerticles] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchOutlets = async () => {
+    const fetchInitialData = async () => {
       try {
-        const res = await axios.get(`${API_BASE_URL}/api/public/outlets`);
-        setOutlets(res.data);
+        const outletRes = await axios.get(`${API_BASE_URL}/api/public/public/outlets`);
+        setOutlets(outletRes.data);
+
+        const verticleRes = await axios.get(`${API_BASE_URL}/api/public/public/verticles`);
+        setVerticles(verticleRes.data);
       } catch (err) {
-        console.error("Failed to load outlets:", err);
-        alert("Could not load outlet list.");
+        console.error("Error loading outlets/verticles:", err);
+        alert("Failed to load outlet or verticle list.");
       }
     };
-    fetchOutlets();
+
+    fetchInitialData();
   }, []);
 
   const handleChange = (e) => {
@@ -40,7 +47,7 @@ export default function Signup() {
       alert("Signup successful! Please wait for admin approval.");
       navigate("/login");
     } catch (err) {
-      console.error("Signup error:", err);
+      console.error("Signup error:", err.response?.data || err.message);
       alert("Signup failed");
     }
   };
@@ -60,6 +67,7 @@ export default function Signup() {
           onChange={handleChange}
           required
         />
+
         <Input
           label="Phone Number"
           name="mobile"
@@ -81,6 +89,24 @@ export default function Signup() {
             {outlets.map((outlet) => (
               <option key={outlet.id} value={outlet.name}>
                 {outlet.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="flex flex-col">
+          <label className="text-sm font-medium mb-1">Select Verticle</label>
+          <select
+            name="verticle"
+            value={formData.verticle}
+            onChange={handleChange}
+            required
+            className="border px-3 py-2 rounded text-sm"
+          >
+            <option value="">-- Select a verticle --</option>
+            {verticles.map((verticle) => (
+              <option key={verticle} value={verticle}>
+                {verticle}
               </option>
             ))}
           </select>
